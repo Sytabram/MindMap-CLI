@@ -13,9 +13,8 @@ class MindMapManager:
         self.storage = Storage(data_dir)
         self.current_map = None
         
-    def create_map(self, title):
-        """Create a new mind map with the given title"""
-        self.current_map = MindMap(title)
+    def create_map(self, title, root_title=None):
+        self.current_map = MindMap(title, root_title)
         return self.current_map
         
     def save_map(self, filename=None):
@@ -48,7 +47,7 @@ class MindMapManager:
         if not self.current_map:
             return False, "No active mind map"
             
-        if parent_title.lower() == "root":
+        if parent_title.lower() == "root" or parent_title.lower() == self.current_map.root.title.lower():
             parent = self.current_map.root
         else:
             parent = self.current_map.search_node(parent_title)
@@ -57,7 +56,8 @@ class MindMapManager:
             return False, f"Parent node '{parent_title}' not found"
             
         new_node = parent.add_child(node_title)
-        return True, f"Added '{node_title}' under '{parent_title}'"
+        parent_display_title = self.current_map.root.title if parent == self.current_map.root else parent_title
+        return True, f"Added '{node_title}' under '{parent_display_title}'"
         
     def delete_node(self, node_title):
         """Delete a node from the mind map"""
@@ -80,6 +80,11 @@ class MindMapManager:
         """Search a node by title"""
         if not self.current_map:
             return None
+        
+        # Special case for 'root'
+        if title.lower() == "root":
+            return self.current_map.root
+            
         return self.current_map.search_node(title)
         
     def display_map(self, node=None, indent=0):
@@ -106,6 +111,7 @@ class MindMapManager:
         
         return {
             "title": self.current_map.title,
+            "root_node": self.current_map.root.title,
             "nodes": node_count,
             "max_depth": max_depth
         }

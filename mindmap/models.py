@@ -41,10 +41,10 @@ class Node:
         return node
         
 class MindMap:
- 
-    def __init__(self, title):
-        self.root = Node(title)
+    def __init__(self, title, root_title=None):
         self.title = title
+        root_node_title = root_title if root_title is not None else title
+        self.root = Node(root_node_title)
         
     def search_node(self, title, node=None):
         if node is None:
@@ -71,12 +71,19 @@ class MindMap:
     def to_dict(self):
         return {
             'title': self.title,
+            'root_title': self.root.title,
             'children': [child.to_dict() for child in self.root.children]
         }
         
     @classmethod
     def from_dict(cls, data):
-        mindmap = cls(data['title'])
+        # Check if the data contains a separate root_title
+        if 'root_title' in data:
+            mindmap = cls(data['title'], data['root_title'])
+        else:
+            # For backward compatibility with older saved maps
+            mindmap = cls(data['title'])
+            
         for child_data in data.get('children', []):
             child = Node.from_dict(child_data, mindmap.root)
             mindmap.root.children.append(child)
