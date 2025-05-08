@@ -46,7 +46,7 @@ class MindMap:
         self.root = Node(title)
         self.title = title
         
-    def find_node(self, title, node=None):
+    def search_node(self, title, node=None):
         if node is None:
             node = self.root
             
@@ -54,7 +54,7 @@ class MindMap:
             return node
             
         for child in node.children:
-            result = self.find_node(title, child)
+            result = self.search_node(title, child)
             if result:
                 return result
                 
