@@ -4,15 +4,17 @@ MindMap CLI - Command-line interface for managing mind maps
 """
 
 from mindmap.models import MindMap
+from mindmap.storage import Storage
+
 
 def display_node(node, indent=0):
-    """Recursively displays a node and its descendants"""
     print("  " * indent + "- " + node.title)
     for child in node.children:
         display_node(child, indent + 1)
 
 def main():
-    """Point d'entrée principal du programme"""
+
+    storage = Storage()
 
     mindmap = MindMap("My Project")
     print(f"Map created: {mindmap.title}")
@@ -31,23 +33,29 @@ def main():
     print("\nMap structure:")
     display_node(root)
     
-    search_for = "Responsive design"
-    found = mindmap.find_node(search_for)
-    if found:
-        path = mindmap.get_path(found)
-        print(f"\nPath for '{search_for}': {' > '.join(path)}")
-        print(f"Level: {found.get_level()}")
-    else:
-        print(f"\nNode '{search_for}' Not Found")
+    filename = "My_Project"
+    if storage.save(mindmap, filename):
+        print(f"\nMap saved in '{filename}.json'")
     
-    print("\nDeleting the 'API' node...")
-    node_to_remove = mindmap.find_node("API")
-    if node_to_remove and node_to_remove.parent:
-        node_to_remove.parent.remove_child(node_to_remove)
-        print("Node deleted")
+    print("\nLoading map from file...")
+    loaded_map = storage.load(filename)
+    if loaded_map:
+        print(f"Map '{loaded_map.title}' successfully loaded")
+        
+        print("\nLoaded card structure:")
+        display_node(loaded_map.root)
+        
+        search_for = "User Interface"
+        found = loaded_map.find_node(search_for)
+        if found:
+            path = loaded_map.get_path(found)
+            print(f"\nNode '{search_for}' Found")
+            print(f"Path: {' > '.join(path)}")
+            print(f"Level: {found.get_level()}")
     
-    print("\nStructure after deletion:")
-    display_node(root)
+    print("\nMind maps available:")
+    for file in storage.list_files():
+        print(f"- {file}")
 
 if __name__ == "__main__":
     main()

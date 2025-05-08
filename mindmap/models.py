@@ -26,6 +26,20 @@ class Node:
     def __str__(self):
         return self.title
     
+    def to_dict(self):
+        return {
+            'title': self.title,
+            'children': [child.to_dict() for child in self.children]
+        }
+    
+    @staticmethod
+    def from_dict(data, parent=None):
+        node = Node(data['title'], parent)
+        for child_data in data.get('children', []):
+            child = Node.from_dict(child_data, node)
+            node.children.append(child)
+        return node
+        
 class MindMap:
  
     def __init__(self, title):
@@ -53,3 +67,17 @@ class MindMap:
             path.insert(0, current.title)
             current = current.parent
         return path
+    
+    def to_dict(self):
+        return {
+            'title': self.title,
+            'children': [child.to_dict() for child in self.root.children]
+        }
+        
+    @classmethod
+    def from_dict(cls, data):
+        mindmap = cls(data['title'])
+        for child_data in data.get('children', []):
+            child = Node.from_dict(child_data, mindmap.root)
+            mindmap.root.children.append(child)
+        return mindmap
