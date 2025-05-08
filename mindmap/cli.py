@@ -10,7 +10,9 @@ class MindMapCLI:
     Command-line interface for MindMap application
     """
     def __init__(self):
+        # Initialize the mind map manager
         self.manager = MindMapManager()
+        # Map of command names to their handler methods
         self.commands = {
             'create': self.create_map,
             'load': self.load_map,
@@ -26,21 +28,23 @@ class MindMapCLI:
         }
         
     def run(self):
-        """Run the CLI application"""
+        """Run the CLI application loop"""
         print("MindMap CLI - Type 'help' for available commands")
         
         while True:
             try:
+                # Get user input
                 command = input("\nmindmap> ").strip()
                 
                 if not command:
                     continue
                 
-                # Split only by the first space to get command and remaining args
+                # Split into command and arguments
                 parts = command.split(maxsplit=1)
                 cmd = parts[0].lower()
                 args = parts[1].split() if len(parts) > 1 else []
                 
+                # Execute the command if recognized
                 if cmd in self.commands:
                     self.commands[cmd](args)
                 else:
@@ -55,16 +59,16 @@ class MindMapCLI:
     def create_map(self, args):
         """Create a new mind map with interactive prompts for title and root node"""
         if args:
-            # If args provided, use them as the map title
+            # Use provided arguments as the map title
             map_title = " ".join(args)
         else:
-            # Otherwise prompt for the map title
+            # Ask the user for the map title
             map_title = input("Enter mind map title: ").strip()
             if not map_title:
                 print("Map title cannot be empty")
                 return
         
-        # Ask if user wants a custom root node title
+        # Ask the user if they want a custom root node title
         use_custom_root = input(f"Use custom root node title? (default: '{map_title}') [y/N]: ").strip().lower()
         
         root_title = None
@@ -74,7 +78,7 @@ class MindMapCLI:
                 print("Using map title as root node title")
                 root_title = None
         
-        # Create the map
+        # Call the manager to create the map
         self.manager.create_map(map_title, root_title)
         
         if root_title:
@@ -83,7 +87,7 @@ class MindMapCLI:
             print(f"Created new mind map: '{map_title}'")
         
     def load_map(self, args):
-        """Open an existing mind map"""
+        """Load an existing mind map from file"""
         if not args:
             print("Usage: load <filename>")
             return
@@ -93,13 +97,13 @@ class MindMapCLI:
         print(message)
         
     def save_map(self, args):
-        """Save the current mind map"""
+        """Save the current mind map to file"""
         filename = args[0] if args else None
         success, message = self.manager.save_map(filename)
         print(message)
         
     def list_maps(self, args):
-        """List all available mind maps"""
+        """List all saved mind maps"""
         files = self.manager.list_maps()
         if not files:
             print("No mind maps found")
@@ -110,18 +114,18 @@ class MindMapCLI:
             print(f"- {file}")
             
     def display_map(self, args):
-        """Display the structure of the current mind map"""
+        """Print the structure of the current mind map"""
         output = self.manager.display_map()
         print("\nMap structure:")
         print(output)
         
     def add_node(self, args):
-        """Add a new node to the mind map with interactive prompts"""
+        """Add a new node to the current mind map"""
         if not self.manager.current_map:
             print("No active mind map. Create or load a map first.")
             return
             
-        # Interactive prompt for parent node
+        # Get the parent node title
         if args:
             parent = " ".join(args)
             print(f"Using '{parent}' as parent node")
@@ -131,7 +135,7 @@ class MindMapCLI:
                 print("Parent node cannot be empty")
                 return
                 
-        # Interactive prompt for new node title
+        # Get the new node title
         title = input("Enter new node title: ").strip()
         if not title:
             print("Node title cannot be empty")
@@ -141,12 +145,12 @@ class MindMapCLI:
         print(message)
         
     def delete_node(self, args):
-        """Delete a node from the mind map with interactive prompt"""
+        """Delete a node from the current mind map"""
         if not self.manager.current_map:
             print("No active mind map. Create or load a map first.")
             return
             
-        # Interactive prompt for node to delete
+        # Get the node title to delete
         if args:
             title = " ".join(args)
             print(f"Attempting to delete node '{title}'")
@@ -156,7 +160,7 @@ class MindMapCLI:
                 print("Node title cannot be empty")
                 return
                 
-        # Confirm deletion
+        # Confirm with the user before deleting
         confirm = input(f"Are you sure you want to delete '{title}'? [y/N]: ").strip().lower()
         if not confirm or confirm[0] != 'y':
             print("Deletion cancelled")
@@ -166,12 +170,12 @@ class MindMapCLI:
         print(message)
         
     def search_node(self, args):
-        """Search a node in the mind map with interactive prompt"""
+        """Search for a node by title"""
         if not self.manager.current_map:
             print("No active mind map. Create or load a map first.")
             return
             
-        # Interactive prompt for node to search
+        # Get the node title to search
         if args:
             title = " ".join(args)
             print(f"Searching for node '{title}'")
@@ -184,6 +188,7 @@ class MindMapCLI:
         node = self.manager.search_node(title)
         
         if node:
+            # Display node path and level
             path = self.manager.current_map.get_path(node)
             print(f"\nNode '{title}' found")
             print(f"Path: {' > '.join(path)}")
@@ -192,7 +197,7 @@ class MindMapCLI:
             print(f"Node '{title}' not found")
             
     def show_info(self, args):
-        """Show information about the current mind map"""
+        """Show basic statistics about the current mind map"""
         info = self.manager.get_map_info()
         if isinstance(info, str):
             print(info)
@@ -204,12 +209,12 @@ class MindMapCLI:
         print(f"Maximum depth: {info['max_depth']}")
         
     def exit_app(self, args):
-        """Exit the application"""
+        """Exit the CLI application"""
         print("Goodbye !")
         sys.exit(0)
         
     def show_help(self, args):
-        """Show help information"""
+        """Show a list of available commands"""
         print("\nAvailable commands:")
         print("  create [map_title]               - Create a new mind map (interactive prompts for details)")
         print("  load <filename>                  - Load an existing mind map")
