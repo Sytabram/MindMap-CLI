@@ -14,7 +14,7 @@ Here are the available commands:
 
 	•	list – List all saved mind maps
 
-	•	add <parent> <title> – Add a new node under the specified parent node
+	•	add <parent> – Add a new node under the specified parent node
 
 	•	delete <title> – Delete a node by its title (root node cannot be deleted)
 
