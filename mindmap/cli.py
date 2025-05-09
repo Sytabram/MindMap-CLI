@@ -134,6 +134,17 @@ class MindMapCLI:
             if not parent:
                 print("Parent node cannot be empty")
                 return
+        
+        # Verify that the parent exists before asking for the child name
+        # Handle special case if parent is 'root'
+        if parent.lower() == "root" or parent.lower() == self.manager.current_map.root.title.lower():
+            parent_node = self.manager.current_map.root
+        else:
+            parent_node = self.manager.current_map.search_node(parent)
+        
+        if not parent_node:
+            print(f"Parent node '{parent}' not found")
+            return
                 
         # Get the new node title
         title = input("Enter new node title: ").strip()

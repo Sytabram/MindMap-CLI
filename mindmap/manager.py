@@ -51,6 +51,11 @@ class MindMapManager:
         if not self.current_map:
             return False, "No active mind map"
         
+        # Check if a node with this title already exists
+        existing_node = self.current_map.search_node(node_title)
+        if existing_node:
+            return False, f"A node with title '{node_title}' already exists"
+        
         # Handle special case if parent is 'root'
         if parent_title.lower() == "root" or parent_title.lower() == self.current_map.root.title.lower():
             parent = self.current_map.root
