@@ -45,9 +45,9 @@ class MindMapManager:
     def list_maps(self):
         """List all available mind maps in the data directory"""
         return self.storage.list_files()
-        
+    
     def add_node(self, parent_title, node_title):
-        """Add a node under the specified parent node"""
+        """Add a node under the specified parent node, limited to 3 levels max (including root)"""
         if not self.current_map:
             return False, "No active mind map"
         
@@ -64,6 +64,11 @@ class MindMapManager:
         
         if not parent:
             return False, f"Parent node '{parent_title}' not found"
+        
+        # Check the level limitation (max 3 levels including root)
+        parent_level = parent.get_level()
+        if parent_level >= 2:
+            return False, f"Cannot add node: maximum depth of 3 levels reached (including root)"
         
         # Add the new child node
         new_node = parent.add_child(node_title)
