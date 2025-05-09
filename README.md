@@ -18,7 +18,7 @@ Here are the available commands:
 
 	•	delete <title> – Delete a node by its title (root node cannot be deleted)
 
-	•	show – Display the structure of the current mind map
+	•	display – Display the structure of the current mind map
 
 	•	info – Show statistics (total nodes and max depth) for the current map
 
